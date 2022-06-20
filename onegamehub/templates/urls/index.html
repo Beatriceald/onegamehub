@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{title}}</title>
+</head>
+<body>
+    {% block content %}
+
+    <h1>Url status checker</h1>
+    <a href="{% url 'register' %}">Registration</a>
+    <a href="{% url 'login' %}">Login</a><br/><br/>
+    {% if user.is_authenticated %}
+        <div id="result"></div>
+        {% for url in urls %}
+            {{url.url_slug}}
+            <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+            <script>
+                $.ajax({
+    url: '{{url.url_slug}}',
+    method: 'get',
+    dataType: 'json',
+    success: function(data){
+	console.dir(data);
+    },
+    error: function (jqXHR, exception) {
+	if (jqXHR.status === 0) {
+		alert('Not connect. Verify Network.' + jqXHR.responseStatus);
+	} else if (jqXHR.status == 404) {
+		alert('Requested page not found (404).');
+	} else if (jqXHR.status == 500) {
+		alert('Internal Server Error (500).');
+	} else if (exception === 'parsererror') {
+		alert('Requested JSON parse failed.');
+	} else if (exception === 'timeout') {
+		alert('Time out error.');
+	} else if (exception === 'abort') {
+		alert('Ajax request aborted.');
+	} else {
+		alert('Uncaught Error. ' + jqXHR.responseText);
+	}
+    }
+});
+            </script>
+        {% endfor %}
+    {% endif %}
+    {% endblock %}
+</body>
+</html>
